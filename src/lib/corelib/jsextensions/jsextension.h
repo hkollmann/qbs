@@ -202,8 +202,10 @@ public:
             using Args = typename FunctionTrait<Func>::Args;
             const auto args = getArgumentsHelper(Args(), ctx, name, argc, argv);
             const auto obj = fromJsObject(ctx, this_val);
-            if (!obj)
-                return JS_UNDEFINED;
+            if (!obj) {
+                QString s = QStringLiteral("jsForward: this is not valid in ") + QString::fromStdString(std::string(name));
+                return throwError(ctx, s);
+            }
             if constexpr (std::is_same_v<Ret, void>) {
                 jsForwardHelperVoid(obj, func, args, std::make_index_sequence<std::tuple_size<decltype(args)>::value>());
                 return JS_UNDEFINED;
